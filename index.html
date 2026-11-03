@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projetor Inteligente</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #000; color: #fff; min-height: 100vh; padding: 20px; }
+        .cabecalho { text-align: center; padding: 20px; margin-bottom: 20px; }
+        h1 { font-size: 2em; margin-bottom: 10px; }
+        .busca { text-align: center; margin-bottom: 30px; }
+        #termo { padding: 12px 20px; font-size: 18px; width: 300px; border-radius: 5px; border: none; }
+        button { padding: 12px 30px; font-size: 18px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+        .imagens { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 30px; }
+        .imagens img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; background: #333; }
+        .status { position: fixed; top: 10px; right: 10px; background: #1a1a1a; padding: 10px 15px; border-radius: 5px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="status" id="status">🔄 Pronto para pesquisar</div>
+    
+    <div class="cabecalho">
+        <h1>🔍 Projetor Inteligente</h1>
+        <p>Digite o que quer ver e aperte Enter</p>
+    </div>
+
+    <div class="busca">
+        <input type="text" id="termo" placeholder="Exemplo: cachorros...">
+        <button onclick="pesquisar()">Pesquisar</button>
+    </div>
+
+    <div class="imagens" id="gradeImagens"></div>
+
+    <script>
+        async function pesquisar(termo = null) {
+            const entrada = document.getElementById('termo');
+            const busca = termo || entrada.value;
+            if (!busca) return;
+            
+            document.getElementById('status').textContent = `🔍 Buscando: ${busca}`;
+            document.getElementById('gradeImagens').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:#aaa">Carregando imagens...</p>';
+            
+            try {
+                const resposta = await fetch(`https://source.unsplash.com/800x600/?${encodeURIComponent(busca)}`);
+                const grade = document.getElementById('gradeImagens');
+                grade.innerHTML = `<div style="grid-column:1/-1;text-align:center;"><img src="${resposta.url}" alt="${busca}" style="width:100%;height:auto;max-height:500px;"></div>`;
+                document.getElementById('status').textContent = `✅ Exibindo: ${busca}`;
+            } catch (erro) {
+                document.getElementById('gradeImagens').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:red">Erro ao carregar. Tente de novo.</p>';
+                document.getElementById('status').textContent = '❌ Erro';
+            }
+        }
+
+        document.getElementById('termo').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') pesquisar();
+        });
+    </script>
+</body>
+</html>
